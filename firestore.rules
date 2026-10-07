@@ -1,0 +1,85 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Fonctions utilitaires ----------
+    function connecte() {
+      return request.auth != null && request.auth.token.email != null;
+    }
+    function profilPath() {
+      return /databases/$(database)/documents/users/$(request.auth.token.email.lower());
+    }
+    function aProfil() { return connecte() && exists(profilPath()); }
+    function profil()  { return get(profilPath()).data; }
+    function actif()   { return aProfil() && profil().actif == true; }
+    function estAdmin()   { return actif() && profil().role == 'admin'; }
+    function estService() { return actif() && profil().role == 'service'; }
+
+    function nombreOk(v) {
+      return v == null || (v is int && v >= 0);
+    }
+
+    function donneesOk(d) {
+      return d is map
+        && d.keys().hasOnly(['malades','exeat','maladesSortis','journees','dc','transferes',
+                             'ecg','dcTable','arrivesDCD','referes','evacues','lits',
+                             'consultants','consultations'])
+        && d.keys().hasAll(['malades','exeat','maladesSortis','journees','dc','transferes',
+                            'ecg','dcTable','arrivesDCD','referes','evacues','lits',
+                            'consultants','consultations'])
+        && nombreOk(d.malades) && nombreOk(d.exeat) && nombreOk(d.maladesSortis)
+        && nombreOk(d.journees) && nombreOk(d.dc) && nombreOk(d.transferes)
+        && nombreOk(d.ecg) && nombreOk(d.dcTable) && nombreOk(d.arrivesDCD)
+        && nombreOk(d.referes) && nombreOk(d.evacues) && nombreOk(d.lits)
+        && nombreOk(d.consultants) && nombreOk(d.consultations);
+    }
+
+    function rapportOk(r) {
+      return r.keys().hasOnly(['periode','serviceId','statut','donnees','observations',
+                               'misAJourPar','misAJourLe','soumisLe'])
+        && r.keys().hasAll(['periode','serviceId','statut','donnees','observations',
+                            'misAJourPar','misAJourLe'])
+        && r.periode is string
+        && r.periode.matches('^[0-9]{4}-(0[1-9]|1[0-2])$')
+        && r.serviceId is string
+        && r.statut in ['brouillon', 'soumis']
+        && r.observations is string && r.observations.size() <= 2000
+        && r.misAJourPar == request.auth.token.email
+        && r.misAJourLe == request.time
+        && donneesOk(r.donnees);
+    }
+
+    // ---------- Profils (créés par le script "creer-comptes", jamais par l'application) ----------
+    match /users/{email} {
+      allow get: if connecte() && (request.auth.token.email.lower() == email || estAdmin());
+      allow list: if estAdmin();
+      allow write: if false;
+    }
+
+    // ---------- Rapports : identifiant = AAAA-MM_serviceId ----------
+    match /rapports/{rapportId} {
+      allow get: if estAdmin()
+        || (estService() && rapportId.split('_')[1] == profil().serviceId);
+
+      allow list: if estAdmin()
+        || (estService() && resource.data.serviceId == profil().serviceId);
+
+      allow create: if rapportOk(request.resource.data)
+        && rapportId == request.resource.data.periode + '_' + request.resource.data.serviceId
+        && (estAdmin()
+            || (estService() && request.resource.data.serviceId == profil().serviceId));
+
+      // Un service ne peut modifier que son brouillon. L'administrateur peut rouvrir un rapport soumis.
+      allow update: if rapportOk(request.resource.data)
+        && request.resource.data.periode == resource.data.periode
+        && request.resource.data.serviceId == resource.data.serviceId
+        && (estAdmin()
+            || (estService()
+                && resource.data.serviceId == profil().serviceId
+                && resource.data.statut == 'brouillon'));
+
+      allow delete: if false;
+    }
+  }
+}

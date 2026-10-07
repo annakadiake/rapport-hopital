@@ -1,0 +1,17 @@
+[
+  { "email": "admin@sjdd.sn", "role": "admin", "nom": "Administrateur" },
+  { "email": "medecine-generale@sjdd.sn", "role": "service", "serviceId": "medecine-generale" },
+  { "email": "pediatrie@sjdd.sn", "role": "service", "serviceId": "pediatrie" },
+  { "email": "cardiologie@sjdd.sn", "role": "service", "serviceId": "cardiologie" },
+  { "email": "urologie@sjdd.sn", "role": "service", "serviceId": "urologie" },
+  { "email": "pneumologie@sjdd.sn", "role": "service", "serviceId": "pneumologie" },
+  { "email": "maladies-infectieuses@sjdd.sn", "role": "service", "serviceId": "maladies-infectieuses" },
+  { "email": "neurologie@sjdd.sn", "role": "service", "serviceId": "neurologie" },
+  { "email": "anesthesie-reanimation@sjdd.sn", "role": "service", "serviceId": "anesthesie-reanimation" },
+  { "email": "chirurgie-generale@sjdd.sn", "role": "service", "serviceId": "chirurgie-generale" },
+  { "email": "neurochirurgie@sjdd.sn", "role": "service", "serviceId": "neurochirurgie" },
+  { "email": "ophtalmologie@sjdd.sn", "role": "service", "serviceId": "ophtalmologie" },
+  { "email": "orl@sjdd.sn", "role": "service", "serviceId": "orl" },
+  { "email": "gyneco-obstetrique@sjdd.sn", "role": "service", "serviceId": "gyneco-obstetrique" },
+  { "email": "reeducation-fonctionnelle@sjdd.sn", "role": "service", "serviceId": "reeducation-fonctionnelle" }
+]

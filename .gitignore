@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+.env.local
+serviceAccountKey.json
+comptes_generes.csv
+scripts/comptes.json

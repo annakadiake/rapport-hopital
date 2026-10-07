@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply bg-blue-700 text-white hover:bg-blue-800; }
+  .btn-secondary { @apply border border-slate-300 bg-white text-slate-800 hover:bg-slate-100; }
+  .champ { @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 disabled:bg-slate-100 disabled:text-slate-600; }
+}
